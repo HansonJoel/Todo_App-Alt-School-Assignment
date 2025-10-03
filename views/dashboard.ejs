@@ -1,0 +1,45 @@
+<% var content = `
+<div class="dashboard-container">
+  <h2>Your Tasks</h2>
+
+  <form action="/tasks/add" method="POST" class="add-task-form">
+    <input type="text" name="title" placeholder="New task..." required>
+    <button type="submit">Add Task</button>
+  </form>
+
+  <div class="filters">
+    <a href="/tasks/dashboard?filter=all">All</a>
+    <a href="/tasks/dashboard?filter=pending">Pending</a>
+    <a href="/tasks/dashboard?filter=completed">Completed</a>
+    <a href="/tasks/dashboard?filter=deleted">Deleted</a>
+  </div>
+
+  <table class="task-table">
+    <thead>
+      <tr>
+        <th>Task</th>
+        <th>Status</th>
+        <th>Change Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${tasks.map(task => `
+        <tr class="${task.status}">
+          <td>${task.title}</td>
+          <td>${task.status}</td>
+          <td>
+            <form action="/tasks/update/${task._id}" method="POST">
+              <select name="status" onchange="this.form.submit()">
+                <option value="pending" ${task.status === 'pending' ? 'selected' : ''}>Pending</option>
+                <option value="completed" ${task.status === 'completed' ? 'selected' : ''}>Completed</option>
+                <option value="deleted" ${task.status === 'deleted' ? 'selected' : ''}>Deleted</option>
+              </select>
+            </form>
+          </td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>
+</div>
+`; %>
+<%- include('layout', { title: 'Dashboard', body: content }) %>

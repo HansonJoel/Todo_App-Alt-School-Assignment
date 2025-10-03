@@ -1,0 +1,7 @@
+<% var content = `
+<div style="text-align: center; padding: 50px">
+  <h2>Oops! Something went wrong</h2>
+  <p class="error">${message}</p>
+  <a href="/tasks/dashboard">Go back to Dashboard</a>
+</div>
+`; %> <%- include('layout', { title: 'Error', body: content }) %>

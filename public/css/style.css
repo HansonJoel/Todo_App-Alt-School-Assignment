@@ -1,0 +1,147 @@
+/* General styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f9f9f9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+header {
+  background: #333;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+nav a {
+  margin-right: 10px;
+  color: #fff;
+  text-decoration: none;
+}
+
+main {
+  margin-top: 100px; /* space for header */
+  width: 95%;
+  max-width: 900px;
+}
+
+/* Center dashboard */
+.dashboard-container {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Forms */
+form {
+  margin: 15px 0;
+}
+
+input,
+button,
+select {
+  padding: 8px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  background: #333;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #555;
+}
+
+/* Filters (All, Pending, Completed, Deleted) */
+.filters {
+  margin: 15px 0;
+}
+
+.filters a {
+  padding: 6px 12px;
+  margin-right: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: bold;
+  color: #fff;
+}
+
+.filters a[href*="all"] {
+  background: #555;
+}
+.filters a[href*="pending"] {
+  background: orange;
+}
+.filters a[href*="completed"] {
+  background: green;
+}
+.filters a[href*="deleted"] {
+  background: red;
+}
+
+/* Task Table */
+.task-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.task-table th,
+.task-table td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+/* Hover effect */
+.task-table tr:hover {
+  background: #f1f1f1;
+  cursor: pointer;
+}
+
+/* Status-based row colors */
+.task-table tr.pending {
+  background: #fff7e6; /* light orange */
+}
+
+.task-table tr.completed {
+  background: #e6ffe6; /* light green */
+  text-decoration: line-through;
+  color: green;
+}
+
+.task-table tr.deleted {
+  background: #ffe6e6; /* light red */
+  text-decoration: line-through;
+  color: red;
+}
+
+/* Error messages */
+.error {
+  color: red;
+  margin-top: 10px;
+}
+/* Additional styles for login and signup pages */
+.auth-container {
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}

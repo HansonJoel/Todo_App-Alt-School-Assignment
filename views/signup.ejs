@@ -1,0 +1,14 @@
+<% var content = `
+<div class="form-container">
+  <form action="/signup" method="POST">
+    <h2>Sign Up</h2>
+    ${typeof error !== 'undefined' ? `
+    <p class="error">${error}</p>
+    ` : ''}
+    <input type="text" name="username" placeholder="Username" required />
+    <input type="password" name="password" placeholder="Password" required />
+    <button type="submit">Register</button>
+  </form>
+  <p>Already have an account? <a href="/login">Login here</a></p>
+</div>
+`; %> <%- include('layout', { title: 'Sign Up', body: content }) %>
