@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sign Up | Todo App</title>
+    <link rel="stylesheet" href="/assets/main.css" />
+  </head>
+  <body>
+    <%- include('partials/signup_header') %>
+
+    <main>
+      <form action="/signup" method="POST" class="signup-form">
+        <h2>Create Your Account</h2>
+
+        <% if (typeof error !== 'undefined') { %>
+        <div class="error-message"><%= error %></div>
+        <% } %>
+
+        <input type="text" name="firstName" placeholder="First Name" required />
+        <input type="text" name="lastName" placeholder="Last Name" required />
+
+        <div class="gender-field">
+          <select name="gender" required>
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+
+        <input type="text" name="username" placeholder="Username" required />
+        <input type="email" name="email" placeholder="Email" required />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+        />
+
+        <div class="dob-field">
+          <label>Date of Birth:</label>
+          <select name="day" required>
+            <option value="">Day</option>
+            <% for (let d = 1; d <= 31; d++) { %>
+            <option value="<%= d %>"><%= d %></option>
+            <% } %>
+          </select>
+
+          <select name="month" required>
+            <option value="">Month</option>
+            <% const months =
+            ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            months.forEach((m, i) => { %>
+            <option value="<%= i + 1 %>"><%= m %></option>
+            <% }); %>
+          </select>
+
+          <select name="year" required>
+            <option value="">Year</option>
+            <% for (let y = 1950; y <= new Date().getFullYear(); y++) { %>
+            <option value="<%= y %>"><%= y %></option>
+            <% } %>
+          </select>
+        </div>
+
+        <input
+          type="tel"
+          name="phone"
+          placeholder="Phone Number (e.g. +2348012345678)"
+          required
+        />
+        <button type="submit">Register</button>
+      </form>
+
+      <p>Already have an account? <a href="/login">Login here</a></p>
+    </main>
+  </body>
+</html>

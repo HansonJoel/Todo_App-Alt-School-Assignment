@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | Todo App</title>
+    <link rel="stylesheet" href="/assets/Dashboard.css" />
+    <script src="/assets/script.js" defer></script>
+  </head>
+
+  <body>
+    <%- include('partials/nav') %>
+
+    <main>
+      <h2>Your Tasks</h2>
+
+      <!-- 🔹 Filters + Search + Date + Add Task -->
+      <div class="controls">
+        <div class="filters">
+          <a
+            href="/tasks/dashboard?filter=all"
+            class="<%= (!filter || filter === 'all') ? 'active' : '' %>"
+            >All</a
+          >
+          <a
+            href="/tasks/dashboard?filter=pending"
+            class="<%= filter === 'pending' ? 'active' : '' %>"
+            >Pending</a
+          >
+          <a
+            href="/tasks/dashboard?filter=completed"
+            class="<%= filter === 'completed' ? 'active' : '' %>"
+            >Completed</a
+          >
+          <a
+            href="/tasks/dashboard?filter=overdue"
+            class="<%= filter === 'overdue' ? 'active' : '' %>"
+            >Overdue</a
+          >
+        </div>
+
+        <button type="button" class="add-task-btn" onclick="openModal()">
+          + Add Task
+        </button>
+
+        <div class="right-controls">
+          <form action="/tasks/dashboard" method="GET" class="search-form">
+            <input type="hidden" name="filter" value="<%= filter || 'all' %>" />
+            <input
+              type="text"
+              name="search"
+              placeholder="Search task or comment..."
+              value="<%= search || '' %>"
+              class="search-input"
+            />
+            <input
+              type="date"
+              name="date"
+              value="<%= date || '' %>"
+              class="date-input"
+            />
+            <button type="submit" class="filter-btn">Search</button>
+            <% if (search || date) { %>
+            <a
+              href="/tasks/dashboard?filter=<%= filter || 'all' %>"
+              class="reset-btn"
+              >Reset</a
+            >
+            <% } %>
+          </form>
+        </div>
+      </div>
+
+      <!-- 🔹 Add Task Modal -->
+      <div id="taskModal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="modalTitle">Add New Task</h3>
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+          </div>
+
+          <form id="taskForm" action="/tasks/add" method="POST">
+            <input type="hidden" name="taskId" id="taskId" />
+
+            <div class="form-group">
+              <label for="title">Task Title *</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                placeholder="Enter task title..."
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="deadline">Deadline *</label>
+              <input
+                type="datetime-local"
+                id="deadline"
+                name="deadline"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="comments">Comments</label>
+              <textarea
+                id="comments"
+                name="comments"
+                placeholder="Add any additional notes..."
+              ></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">Save Task</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- 🔹 Task Table -->
+      <div class="task-table">
+        <div class="task-header">
+          <div>Task</div>
+          <div>Status</div>
+          <div>Deadline</div>
+          <div>Comments</div>
+          <div>Actions</div>
+        </div>
+
+        <ul class="task-list">
+          <% if (noResults) { %>
+            <li class="no-tasks">No record found.</li>
+          <% } else if (tasks.length === 0) { %>
+            <li class="no-tasks">No tasks found. Click "Add Task" to create one!</li>
+          <% } else { %>
+            <% tasks.forEach(task => { %>
+              <li class="task-item <%= task.status %>">
+                <!-- <li class="task-item"> -->
+                <div class="task-title"><%= task.title %></div>
+
+                <div>
+                  <form action="/tasks/update/<%= task._id %>" method="POST" style="display:inline">
+                    <select name="status" class="status-select" onchange="this.form.submit()">
+                      <option value="pending" <%= task.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                      <option value="completed" <%= task.status === 'completed' ? 'selected' : '' %>>Completed</option>
+                    </select>
+                  </form>
+                </div>
+
+                <div class="task-deadline <%= task.deadline && new Date(task.deadline) < new Date() && task.status !== 'completed' ? 'overdue' : '' %>">
+                  <%= task.deadline ? new Date(task.deadline).toLocaleString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  }) : 'No deadline' %>
+                </div>
+
+                <div class="task-comments">
+                  <%= task.comments || 'No comments' %>
+                </div>
+
+                <div class="task-actions">
+                  <button
+                    type="button"
+                    class="action-btn edit-btn"
+                    data-id="<%= task._id %>"
+                    data-title="<%= task.title ? task.title.replace(/"/g, '&quot;') : '' %>"
+                    data-deadline="<%= task.deadline ? new Date(task.deadline).toISOString().slice(0,16) : '' %>"
+                    data-comments="<%= task.comments ? task.comments.replace(/"/g, '&quot;') : '' %>"
+                    onclick="editTask(this)"
+                    title="Edit task"
+                  >✏️</button>
+
+                  <form
+                    action="/tasks/delete/<%= task._id %>"
+                    method="POST"
+                    style="display:inline;"
+                    onsubmit="return confirm('Are you sure you want to delete this task?')"
+                  >
+                    <button type="submit" class="action-btn delete-btn" title="Delete task">🗑️</button>
+                  </form>
+                </div>
+              </li>
+            <% }) %>
+          <% } %>
+        </ul>
+
+        <!-- 🔹 Pagination (with preserved filters) -->
+        <% if (totalPages > 1) { %>
+        <div class="pagination">
+          <% const queryParams = 'filter=' + (filter || 'all') + '&search=' +
+          encodeURIComponent(search || '') + '&date=' + encodeURIComponent(date
+          || ''); %> <% if (currentPage > 1) { %>
+          <a
+            href="/tasks/dashboard?<%= queryParams %>&page=<%= currentPage - 1 %>"
+            class="page-btn"
+            >Prev</a
+          >
+          <% } %> <% for (let i = 1; i <= totalPages; i++) { %>
+          <a
+            href="/tasks/dashboard?<%= queryParams %>&page=<%= i %>"
+            class="page-btn <%= currentPage === i ? 'active' : '' %>"
+          >
+            <%= i %>
+          </a>
+          <% } %> <% if (currentPage < totalPages) { %>
+          <a
+            href="/tasks/dashboard?<%= queryParams %>&page=<%= currentPage + 1 %>"
+            class="page-btn"
+            >Next</a
+          >
+          <% } %>
+        </div>
+        <% } %>
+      </div>
+    </main>
+  </body>
+</html>
