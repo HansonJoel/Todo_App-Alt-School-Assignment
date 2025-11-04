@@ -1,0 +1,734 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #f5f7fa;
+  color: #333;
+}
+
+/* ========== NAVBAR STYLING ========== */
+.main-header {
+  display: flex;
+  justify-content: center; /* Centers the h1 horizontally */
+  align-items: center;
+  background: #333;
+  color: #fff;
+  padding: 15px 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  position: relative; /* Needed for positioning the logout button */
+}
+
+.main-header h1 {
+  font-size: 1.8rem;
+  margin: 0;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* Keep the logout button on the right */
+.main-header nav {
+  position: absolute;
+  right: 30px;
+}
+
+.main-header .logout-btn {
+  background: #e63946;
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.main-header .logout-btn:hover {
+  background: #c1121f;
+}
+
+/* Main Content */
+main {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+  text-align: center;
+}
+
+/* Control Content*/
+/* .controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+} */
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  background: #fff;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Filter Buttons */
+.filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.filters a {
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: #555;
+  border-radius: 5px;
+  background: #f1f1f1;
+  border: 1px solid #ddd;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.filters a:hover {
+  background: #e9ecef;
+  color: #2c3e50;
+}
+
+.filters a.active {
+  background: #007bff;
+  color: white;
+}
+
+/* .filters {
+  display: flex;
+  gap: 0.5rem;
+  background: white;
+  padding: 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.filters a {
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: #555;
+  border-radius: 5px;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.filters a:hover {
+  background: #e9ecef;
+  color: #2c3e50;
+}
+
+.filters a.active {
+  background: #007bff;
+  color: white;
+} */
+
+/* .add-task-btn {
+  padding: 0.6rem 1.5rem;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.add-task-btn:hover {
+  background: #218838;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
+} */
+
+/* Add Task Button */
+.add-task-btn {
+  padding: 0.5rem 1rem;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+  transition: all 0.3s ease;
+}
+
+.add-task-btn:hover {
+  background: #218838;
+  transform: translateY(-2px);
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideDown 0.3s ease;
+}
+
+/* ========== ICON STYLING ========== */
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0.25rem;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.edit-btn {
+  color: #007bff;
+}
+
+.delete-btn {
+  color: #e63946;
+}
+
+.action-btn:hover {
+  transform: scale(1.2);
+}
+
+/* ========== PAGINATION ========== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 2rem 0;
+}
+
+.page-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  background: white;
+  color: #007bff;
+  border: 1px solid #007bff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.page-btn:hover {
+  background: #007bff;
+  color: white;
+}
+
+.page-btn.active {
+  background: #007bff;
+  color: white;
+  pointer-events: none;
+}
+
+/* Row background based on status */
+.task-item.pending {
+  background: #fff8e6; /* Light orange */
+}
+
+.task-item.completed {
+  background: #e9f9ed; /* Light green */
+}
+
+.task-item {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1fr 0.8fr;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  align-items: center;
+  transition: background 0.2s ease;
+}
+
+.task-item:hover {
+  background: #f8f9fa;
+}
+
+.task-item:last-child {
+  border-bottom: none;
+}
+
+.task-title {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.task-deadline {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.task-deadline.overdue {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.task-comments {
+  color: #777;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.task-actions {
+  display: flex;
+  justify-content: center; /* centers icons vertically on resize */
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ===============================
+   TASK STATUS COLORS & ROW STYLING
+================================= */
+.task-item.pending {
+  background: #fff4e0; /* Light orange background */
+  border-left: 5px solid #ffa94d;
+}
+
+.task-item.completed {
+  background: #e9fbe8; /* Light green background */
+  border-left: 5px solid #51cf66;
+}
+
+/* Optional: color the text of the select field */
+.status-select option[value="pending"] {
+  color: #d97706; /* darker orange text */
+}
+
+.status-select option[value="completed"] {
+  color: #2e7d32; /* darker green text */
+}
+
+/* Optional: when user hovers over pending or completed row */
+.task-item.pending:hover {
+  background: #ffe8cc;
+}
+
+.task-item.completed:hover {
+  background: #d8f5d8;
+}
+
+/* Also style the status-select box itself dynamically */
+.status-select {
+  font-weight: 600;
+}
+
+.task-item.pending .status-select {
+  background: #fffaf3;
+  border-color: #ffecb5;
+  color: #b86b00;
+}
+
+.task-item.completed .status-select {
+  background: #f0fff4;
+  border-color: #a3e635;
+  color: #1b5e20;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modal-header h3 {
+  font-size: 1.5rem;
+  color: #2c3e50;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #999;
+  transition: color 0.3s;
+}
+
+.close-modal:hover {
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.submit-btn:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+/* Table Styles */
+.task-table {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.task-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1fr 0.8fr;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: #2c3e50;
+  color: white;
+  font-weight: 600;
+}
+
+.task-list {
+  list-style: none;
+}
+
+.task-item {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1.5fr 1fr 0.8fr;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e9ecef;
+  align-items: center;
+  transition: background 0.2s;
+}
+
+.task-item:hover {
+  background: #f8f9fa;
+}
+
+.task-item:last-child {
+  border-bottom: none;
+}
+
+.task-title {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.task-deadline {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.task-deadline.overdue {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.task-comments {
+  color: #777;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-select {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: white;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.status-select option[value="pending"] {
+  color: #ffc107;
+}
+
+.status-select option[value="completed"] {
+  color: #28a745;
+}
+
+.task-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 0.25rem;
+  transition: transform 0.2s;
+}
+
+.action-btn:hover {
+  transform: scale(1.2);
+}
+
+.edit-btn {
+  color: #007bff;
+}
+
+.delete-btn {
+  color: #dc3545;
+}
+
+.no-tasks {
+  padding: 3rem;
+  text-align: center;
+  color: #999;
+  font-size: 1.1rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.status-badge.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.completed {
+  background: #d4edda;
+  color: #155724;
+}
+
+/* Pagination styles*/
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 2rem 0;
+}
+
+.page-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  background: white;
+  color: #007bff;
+  border: 1px solid #007bff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.page-btn:hover {
+  background: #007bff;
+  color: white;
+}
+
+.page-btn.active {
+  background: #007bff;
+  color: white;
+  pointer-events: none;
+}
+
+/* Search button*/
+.search-section {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-form {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.search-form input[type="text"] {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.search-form input[type="date"] {
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.search-btn {
+  background: #333;
+  color: white;
+  border: none;
+  padding: 7px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* reset button*/
+.right-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Push contents to the far right */
+  gap: 10px; /* spacing between search and filter buttons */
+  margin-left: auto; /* pushes the whole section to the right */
+  flex: 1;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-input,
+.date-input {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.filter-btn,
+.reset-btn {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.reset-btn {
+  background-color: #dc3545;
+}
+
+.filter-btn:hover {
+  background-color: #0056b3;
+}
+
+.reset-btn:hover {
+  background-color: #b02a37;
+}
+
+@media (max-width: 768px) {
+  .task-header,
+  .task-item {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .task-header {
+    display: none;
+  }
+
+  .task-item {
+    padding: 1rem;
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters {
+    justify-content: center;
+  }
+}
