@@ -72,24 +72,27 @@ passport.use(
   "login",
   new localStrategy(
     {
-      usernameField: "username",
+      usernameField: "identifier", // email OR username
       passwordField: "password",
     },
-    async (username, password, done) => {
+    async (identifier, password, done) => {
       try {
-        const user = await UserModel.findOne({ username });
+        // search email first, if not found search username
+        const user =
+          (await UserModel.findOne({ email: identifier })) ||
+          (await UserModel.findOne({ username: identifier }));
 
         if (!user) {
-          return done(null, false, { message: "Username not found" });
+          return done(null, false, { message: "User not found" });
         }
 
-        const validate = await user.isValidPassword(password);
+        const valid = await user.isValidPassword(password);
 
-        if (!validate) {
-          return done(null, false, { message: "Wrong Password" });
+        if (!valid) {
+          return done(null, false, { message: "Wrong password" });
         }
 
-        return done(null, user, { message: "Logged in Successfully" });
+        return done(null, user, { message: "Login successful" });
       } catch (error) {
         return done(error);
       }
