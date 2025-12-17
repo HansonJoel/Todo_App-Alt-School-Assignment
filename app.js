@@ -1,15 +1,17 @@
 const express = require("express");
 const passport = require("passport");
-
 require("dotenv").config();
+
 const database = require("./database");
 database.connectDB();
+
 const PORT = process.env.PORT || 3000;
 const HOSTNAME = "localhost";
+
 const session = require("express-session");
+const MongoStore = require("connect-mongo").default;
 const cookieParser = require("cookie-parser");
 const path = require("path");
-
 const bodyParser = require("body-parser");
 
 // Load passport config BEFORE routes
@@ -35,14 +37,24 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.json());
 
-// ✅ REQUIRED for OTP flow
+// PERSISTENT SESSION (REQUIRED for OTP in production)
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.mongoURL,
+      collectionName: "sessions",
+    }),
+    cookie: {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+    },
   })
 );
+
+// Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
