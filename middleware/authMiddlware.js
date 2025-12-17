@@ -2,50 +2,25 @@ const passport = require("passport");
 const localStrategy = require("passport-local").Strategy;
 const UserModel = require("../models/user");
 
-const JWTstrategy = require("passport-jwt").Strategy;
-const ExtractJWT = require("passport-jwt").ExtractJwt;
-
-passport.use(
-  new JWTstrategy(
-    {
-      secretOrKey: process.env.JWT_SECRET,
-      jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(), // Use this if you are using Bearer token
-    },
-    async (token, done) => {
-      try {
-        return done(null, token.user);
-      } catch (error) {
-        done(error);
-      }
-    }
-  )
-);
-
-// This middleware saves the information provided by the user to the database,
-// and then sends the user information to the next middleware if successful.
-// Otherwise, it reports an error.
+// Signup strategy: Creates a new user in the database with the provided info.
+// Marks the user as unverified.
+// Passes the created user to the next middleware, or reports an error if creation fails.
+// OTP/email verification is handled in the route, not here.
 passport.use(
   "signup",
   new localStrategy(
     {
-      usernameField: "username", //field used for login
-      passwordField: "password", // field used for login
-      passReqToCallback: true, // gives acces to req.body
+      usernameField: "username",
+      passwordField: "password",
+      passReqToCallback: true,
     },
     async (req, username, password, done) => {
       try {
-        // Extract fields from form
         const { firstName, lastName, email, phone, gender, day, month, year } =
           req.body;
 
-        // ✅ Group date fields correctly
-        const dateOfBirth = {
-          day,
-          month,
-          year,
-        };
+        const dateOfBirth = { day, month, year };
 
-        // create the user with all fields
         const user = await UserModel.create({
           firstName,
           lastName,
@@ -55,6 +30,7 @@ passport.use(
           phone,
           gender,
           dateOfBirth,
+          verified: false, // mark as unverified
         });
 
         return done(null, user);
@@ -65,34 +41,38 @@ passport.use(
   )
 );
 
+
 // This middleware authenticates the user based on the email and password provided.
+// Prevent Login for Unverified Users
 // If the user is found, it sends the user information to the next middleware.
 // Otherwise, it reports an error.
 passport.use(
   "login",
   new localStrategy(
     {
-      usernameField: "identifier", // email OR username
+      usernameField: "identifier",
       passwordField: "password",
     },
     async (identifier, password, done) => {
       try {
-        // search email first, if not found search username
-        const user =
-          (await UserModel.findOne({ email: identifier })) ||
-          (await UserModel.findOne({ username: identifier }));
+        // Allow login by username OR email
+        const user = await UserModel.findOne({
+          $or: [{ username: identifier }, { email: identifier }],
+        });
 
-        if (!user) {
-          return done(null, false, { message: "User not found" });
+        if (!user) return done(null, false, { message: "User not found" });
+
+        // Prevent login if email not verified
+        if (!user.verified) {
+          return done(null, false, {
+            message: "Please verify your email first",
+          });
         }
 
         const valid = await user.isValidPassword(password);
+        if (!valid) return done(null, false, { message: "Wrong password" });
 
-        if (!valid) {
-          return done(null, false, { message: "Wrong password" });
-        }
-
-        return done(null, user, { message: "Login successful" });
+        return done(null, user);
       } catch (error) {
         return done(error);
       }
