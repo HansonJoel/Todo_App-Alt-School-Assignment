@@ -6,18 +6,24 @@ const database = require("./database");
 database.connectDB();
 const PORT = process.env.PORT || 3000;
 const HOSTNAME = "localhost";
+const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 
 const bodyParser = require("body-parser");
 
-// ✅ Load passport config BEFORE routes
+// Load passport config BEFORE routes
 require("./middleware/authMiddlware");
 
+// Routes
 const authRoutes = require("./routes/auth");
 const taskRoutes = require("./routes/task");
+const passwordResetRoutes = require("./routes/passwordReset");
+const emailVerificationRoutes = require("./routes/Email_verification");
+
 const app = express();
 
+// View Engine
 app.set("view engine", "ejs");
 app.set("views", "views");
 
@@ -25,14 +31,26 @@ app.set("views", "views");
 app.use(express.static(path.join(__dirname, "public")));
 
 // middlewares
-app.use(passport.initialize());
-app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
+// ✅ REQUIRED for OTP flow
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Routes
 app.use("/", authRoutes);
 app.use("/tasks", taskRoutes);
+app.use("/forgot_password", passwordResetRoutes);
+app.use("/email_verification", emailVerificationRoutes);
 
 app.get("/", (req, res) => {
   res.render("homepage");
