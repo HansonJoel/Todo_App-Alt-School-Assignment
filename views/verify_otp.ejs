@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login | Todo App</title>
+    <link rel="stylesheet" href="/assets/main.css" />
+  </head>
+  <body>
+    <%- include('partials/login_header') %>
+
+    <main>
+      <form method="POST" action="/forgot_password/verify-otp">
+        <input name="otp" placeholder="Enter OTP" required />
+        <button>Verify OTP</button>
+      </form>
+
+      <% if (typeof error !== 'undefined') { %>
+      <div class="error-message"><%= error %></div>
+      <% } %> <% if (typeof success !== 'undefined') { %>
+      <div class="success-message"><%= success %></div>
+      <% } %>
+
+      <form method="POST" action="/forgot_password/resend-otp">
+        <button>Resend OTP</button>
+      </form>
+    </main>
+  </body>
+</html>
