@@ -1,6 +1,9 @@
 const express = require("express");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+const sendVerificationOTP = require("../utils/sendVerificationOTP");
+
 const router = express.Router();
 
 // GET signup page
@@ -13,34 +16,49 @@ router.get("/login", (req, res) => {
   res.render("login");
 });
 
-// POST signup (register new user)
+// GET forgotten password
+router.get("/forgotten_password", (req, res) => {
+  res.render("forgotten_password");
+});
+
+// POST Signup
 router.post("/signup", async (req, res, next) => {
   passport.authenticate("signup", async (err, user, info) => {
     try {
       if (err) {
-        // Handle duplicate key error (MongoDB error code 11000)
         if (err.code === 11000) {
           const field = Object.keys(err.keyValue)[0];
-          const message =
-            field === "email"
-              ? "This email is already registered. Please use a different email."
-              : "This username is already taken. Please choose another username.";
-          return res.status(400).render("signup", { error: message });
+          return res.render("signup", {
+            error:
+              field === "email"
+                ? "Email already registered"
+                : "Username already taken",
+          });
         }
+        return res.render("signup", { error: "Signup failed" });
+      }
 
-        // Catch any other validation error
-        console.error(err);
-        return res.status(400).render("signup", {
-          error: "An unexpected error occurred. Please try again.",
+      if (!user) {
+        return res.render("signup", {
+          error: info?.message || "Signup failed",
         });
       }
 
-      // ✅ Success — redirect to login
-      res.redirect("/login");
+      // ✅ Save email in session
+      req.session.email = user.email;
+
+      // ✅ SEND OTP 
+      await sendVerificationOTP(user);
+
+      // ✅ REDIRECT TO VERIFY PAGE
+      return res.render("verify_email", {
+        email: user.email,
+      });
     } catch (error) {
-      console.error(error);
-      return res.status(500).render("signup", {
-        error: "A server error occurred. Please try again.",
+      console.error("OTP error:", error);
+      return res.render("verify_email", {
+        email: user.email,
+        error: "Account created but OTP could not be sent. Please resend.",
       });
     }
   })(req, res, next);
@@ -51,37 +69,29 @@ router.post("/login", async (req, res, next) => {
   passport.authenticate("login", async (err, user, info) => {
     try {
       if (err) return next(err);
-
-      if (!user) {
-        // Invalid credentials
-        const message = info?.message || "Invalid username or password.";
-        return res.status(400).render("login", { error: message });
-      }
+      if (!user)
+        return res
+          .status(400)
+          .render("login", { error: info?.message || "Invalid credentials" });
 
       req.login(user, { session: false }, async (error) => {
         if (error) return next(error);
-
-        const body = { _id: user._id, email: user.email };
-        const token = jwt.sign({ user: body }, process.env.JWT_SECRET, {
-          expiresIn: "1h",
-        });
-
-        // Store JWT in cookie
+        const token = jwt.sign(
+          { user: { _id: user._id, email: user.email } },
+          process.env.JWT_SECRET,
+          { expiresIn: "1h" }
+        );
         res.cookie("jwt", token, { httpOnly: true, maxAge: 3600000 });
-
-        // Redirect to dashboard
-        return res.redirect("/tasks/dashboard");
+        res.redirect("/tasks/dashboard");
       });
     } catch (error) {
       console.error(error);
-      return res.status(500).render("login", {
-        error: "A server error occurred. Please try again.",
-      });
+      res.status(500).render("login", { error: "Server error" });
     }
   })(req, res, next);
 });
 
-// LOGOUT
+// Logout
 router.get("/logout", (req, res) => {
   res.clearCookie("jwt");
   res.redirect("/login");
