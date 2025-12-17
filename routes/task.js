@@ -1,5 +1,4 @@
 const express = require("express");
-const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const Task = require("../models/task");
 const User = require("../models/user");
@@ -19,48 +18,8 @@ function authenticateJWT(req, res, next) {
   });
 }
 
-// 🧾 GET Dashboard — show only logged-in user's tasks with pagination
-// router.get("/dashboard", authenticateJWT, async (req, res) => {
-//   try {
-//     const filter = req.query.filter || "all";
-//     const page = parseInt(req.query.page) || 1;
-//     const limit = 5; // show 5 tasks per page
-
-//     let query = { user: req.user._id };
-
-//     if (filter === "pending") {
-//       query.status = "pending";
-//     } else if (filter === "completed") {
-//       query.status = "completed";
-//     } else if (filter === "overdue") {
-//       query.deadline = { $lt: new Date() };
-//       query.status = { $ne: "completed" };
-//     }
-
-//     const totalTasks = await Task.countDocuments(query);
-//     const totalPages = Math.ceil(totalTasks / limit);
-//     const skip = (page - 1) * limit;
-
-//     const tasks = await Task.find(query)
-//       .sort({ createdAt: -1 })
-//       .skip(skip)
-//       .limit(limit);
-
-//     res.render("dashboard", {
-//       tasks,
-//       filter,
-//       user: req.user,
-//       currentPage: page,
-//       totalPages,
-//     });
-//   } catch (err) {
-//     console.error("Dashboard error:", err);
-//     res.status(500).send("Error loading dashboard");
-//   }
-// });
 
 // Dashboard route with filtering, search, and date filter
-// 🧭 Dashboard route with filtering, search, and date filter
 router.get("/dashboard", authenticateJWT, async (req, res) => {
   try {
     const userId = req.user._id; // Now req.user is defined because of authenticateJWT
