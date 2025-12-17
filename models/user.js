@@ -40,6 +40,10 @@ const userSchema = new mongoose.Schema({
     month: { type: Number, required: true },
     year: { type: Number, required: true },
   },
+  verified: {
+    type: Boolean,
+    default: false,
+  },
   // ✅ Add this to link user's tasks
   tasks: [
     {
