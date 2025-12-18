@@ -1,37 +1,38 @@
-const nodemailer = require("nodemailer");
-const { AUTH_EMAIL, AUTH_PASS } = process.env;
+const SibApiV3Sdk = require("sib-api-v3-sdk");
 
-// Create transporter
-let transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: AUTH_EMAIL,
-    pass: AUTH_PASS,
-  },
-});
+const client = SibApiV3Sdk.ApiClient.instance;
+const apiKey = client.authentications["api-key"];
+apiKey.apiKey = process.env.BREVO_API_KEY;
 
-// Test transporter
-transporter.verify((error, success) => {
-  if (error) {
-    console.log("SMTP Error", error);
-  } else {
-    console.log("Server Ready to Send Email");
-  }
-});
+// Create transactional emails API instance
+const transactionalEmailApi = new SibApiV3Sdk.TransactionalEmailsApi();
 
 // Generic send email function
-const sendEmail = async (mailOptions) => {
+const sendEmail = async ({ to, subject, html }) => {
   try {
-    await transporter.sendMail(mailOptions);
+    const emailData = {
+      sender: {
+        name: process.env.APP_NAME || "Todo App",
+        email: process.env.BREVO_SENDER_EMAIL, // Email MUST be verified in Brevo
+      },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
+    };
+
+    await transactionalEmailApi.sendTransacEmail(emailData);
+
+    console.log(`Email sent to ${to}`);
   } catch (error) {
+    console.error("Brevo Email Error:", error?.response?.body || error);
     throw error;
   }
 };
 
-// ================================
-// Email Templates
-// ================================
+// Call this once at app start
+console.log("Brevo API key detected. Ready to send emails.");
 
+// Email Templates
 // Password Reset OTP
 const sendPasswordResetOTP = async (email, otp, firstName) => {
   const subject = "Password Reset Request";
@@ -64,7 +65,7 @@ const sendPasswordResetOTP = async (email, otp, firstName) => {
     </html>
   `;
 
-  await sendEmail({ from: AUTH_EMAIL, to: email, subject, html });
+  await sendEmail({ to: email, subject, html });
 };
 
 // Resend OTP
@@ -99,7 +100,7 @@ const sendResendOTP = async (email, otp, firstName) => {
     </html>
   `;
 
-  await sendEmail({ from: AUTH_EMAIL, to: email, subject, html });
+  await sendEmail({ to: email, subject, html });
 };
 
 // Email Verification OTP
@@ -134,7 +135,7 @@ const sendEmailVerificationOTP = async (email, otp, firstName) => {
     </html>
   `;
 
-  await sendEmail({ from: AUTH_EMAIL, to: email, subject, html });
+  await sendEmail({ to: email, subject, html });
 };
 
 module.exports = {
