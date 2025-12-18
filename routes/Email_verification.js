@@ -17,6 +17,8 @@ router.post("/verify_email", async (req, res) => {
     const { otp } = req.body;
     const email = req.session.email;
 
+    if (!email) return res.redirect("/signup");
+
     const record = await OTP.findOne({ email });
     if (!record) {
       return res.render("verify_email", {
@@ -46,11 +48,12 @@ router.post("/verify_email", async (req, res) => {
 
     req.session.email = null;
 
+    console.log(`Email verified successfully for ${email}`);
     res.render("login", {
       success: "Email verified successfully. You can login now.",
     });
   } catch (err) {
-    console.error(err);
+    console.error("Error verifying OTP:", err);
     res.render("verify_email", { error: "Server error" });
   }
 });
@@ -59,21 +62,24 @@ router.post("/verify_email", async (req, res) => {
 router.post("/resend_otp", async (req, res) => {
   try {
     const email = req.session.email;
-    const user = await User.findOne({ email });
+    if (!email) return res.redirect("/signup");
 
+    const user = await User.findOne({ email });
     if (!user) return res.redirect("/signup");
 
+    console.log(`Resending OTP to ${email}`);
     await sendVerificationOTP(user);
+    console.log(`OTP resent successfully to ${email}`);
 
     res.render("verify_email", {
       email,
       success: "OTP resent successfully",
     });
   } catch (err) {
-    console.error(err);
+    console.error("Failed to resend OTP:", err);
     res.render("verify_email", {
       email: req.session.email,
-      error: "Could not resend OTP",
+      error: "Could not resend OTP. Please try again.",
     });
   }
 });
