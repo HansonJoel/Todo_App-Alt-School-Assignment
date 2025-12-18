@@ -4,19 +4,35 @@ const { hashData } = require("./hashData");
 const { sendEmailVerificationOTP } = require("./sendEmail");
 
 const sendVerificationOTP = async (user) => {
-  const otp = await generateOTP();
-  const hashedOTP = await hashData(otp);
+  try {
+    // Generate OTP
+    const otp = await generateOTP();
 
-  await OTP.deleteOne({ email: user.email });
+    // Hash OTP
+    const hashedOTP = await hashData(otp);
 
-  await OTP.create({
-    email: user.email,
-    otp: hashedOTP,
-    createdAt: Date.now(),
-    expiresAt: Date.now() + 3600000, // 1 hour
-  });
+    // Remove any existing OTP for this email
+    await OTP.deleteOne({ email: user.email });
 
-  await sendEmailVerificationOTP(user.email, otp, user.firstName);
+    // Create new OTP record
+    await OTP.create({
+      email: user.email,
+      otp: hashedOTP,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 3600000, // 1 hour
+    });
+
+    // Log sending info
+    console.log("Sending OTP to:", user.email);
+
+    // Send email using Brevo
+    await sendEmailVerificationOTP(user.email, otp, user.firstName || "User");
+
+    console.log("OTP successfully sent to:", user.email);
+  } catch (error) {
+    console.error("Error sending verification OTP:", error);
+    throw error;
+  }
 };
 
 module.exports = sendVerificationOTP;
