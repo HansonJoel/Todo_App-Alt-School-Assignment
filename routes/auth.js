@@ -36,6 +36,14 @@ router.post("/signup", async (req, res, next) => {
                 : "Username already taken",
           });
         }
+
+        // Handle validation errors (like phone format)
+        if (err.name === "ValidationError") {
+          const messages = Object.values(err.errors).map((e) => e.message);
+          return res.render("signup", { error: messages[0] });
+        }
+
+        // Generic error fallback
         console.log("Signup error:", err);
         return res.render("signup", { error: "Signup failed" });
       }
