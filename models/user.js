@@ -53,6 +53,15 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
+// Normalize phone number before validation
+userSchema.pre("validate", function (next) {
+  if (this.phone) {
+    // Remove all spaces
+    this.phone = this.phone.replace(/\s+/g, "");
+  }
+  next();
+});
+
 // The code in the UserScheme.pre() function is called a pre-hook.
 // Before the user information is saved in the database, this function will be called,
 // you will get the plain text password, hash it, and store it.
